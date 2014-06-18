@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from mixcoatl.infrastructure.server import Server
+from mixcoatl.admin.account import Account
 from prettytable import PrettyTable
 from datetime import datetime
 import argparse, sys
@@ -29,7 +30,7 @@ if __name__ == '__main__':
             servers = Server.all()
 
         server_table = PrettyTable(
-            ["ID", "Start Date", "Cloud", "Region", "Provider ID", "Server Name", "Owner", "Status", "Budget", "Termination"])
+            ["ID", "Account", "Start Date", "Cloud", "Region", "Provider ID", "Server Name", "Owner", "Status", "Budget", "Termination"])
 
         cur = str(datetime.utcnow())
         curtime = datetime.strptime(cur, '%Y-%m-%d %H:%M:%S.%f')
@@ -39,6 +40,12 @@ if __name__ == '__main__':
                 owning_user = server.owning_user['email']
             except AttributeError:
                 owning_user = "Not Found"
+
+            try:
+                account = server.owning_user['account']['account_id']
+                a=Account(account)
+            except AttributeError:
+                account = "Not Found"
 
             try:
                 terminate_after = server.terminate_after
@@ -51,7 +58,7 @@ if __name__ == '__main__':
 
             #if terminate_after is not None:
             server_table.add_row(
-                [server.server_id, datetime.strptime(server.start_date.split("+")[0], '%Y-%m-%dT%H:%M:%S.%f'), server.cloud['cloud_provider_name'], server.region['name'], server.provider_id,
+                [server.server_id, a.name, datetime.strptime(server.start_date.split("+")[0], '%Y-%m-%dT%H:%M:%S.%f'), server.cloud['cloud_provider_name'], server.region['name'], server.provider_id,
                  server.name, owning_user, server.status, server.budget, newdiff])
 
         print(server_table)
