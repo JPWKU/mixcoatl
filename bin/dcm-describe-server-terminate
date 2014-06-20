@@ -44,6 +44,8 @@ if __name__ == '__main__':
             try:
                 account = server.owning_user['account']['account_id']
                 a=Account(account)
+                if not a:
+                    a = "Not Found"
             except AttributeError:
                 account = "Not Found"
 
